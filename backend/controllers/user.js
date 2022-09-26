@@ -26,7 +26,7 @@ if(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,20}$/.test(pass
 exports.signup = (req, res, next) => {
     if(ValidateEmail(req.body.email)){
         if(ValidatePassword(req.body.password)){
-            bcrypt.hash(req.body.password, 10)
+            bcrypt.hash(req.body.password, parseInt(process.env.HASHNUMBER))
                 .then(hash => {
                     var sqlSearchEmail = 'SELECT * FROM users WHERE email = ?';
                     var searchQuery = mysql.format(sqlSearchEmail, [req.body.email]);
@@ -35,22 +35,18 @@ exports.signup = (req, res, next) => {
                     var sqlInsertUserRole = 'INSERT INTO users_roles VALUES (LAST_INSERT_ID(), DEFAULT)'
                     db.query(searchQuery, (err,data) => {
                         if(err){
-                            console.log('Error searching query');
                             throw err;
                         }
                         if(data.length != 0){
-                            console.log('Email already exists !');
                             res.status(409).json('This email already exists.')
                         }
                         else{
                             db.query(insertUserQuery, (err,data) => {
                                 if(err){
-                                    console.log('Creation of user failed');
                                     throw err;   
                                 }
                                 db.query(sqlInsertUserRole, (err,data) => {
                                     if(err){
-                                        console.log('Creation of link entry failed');
                                         throw err;
                                     }
                                     res.status(201).json('Bienvenue !')
@@ -64,12 +60,10 @@ exports.signup = (req, res, next) => {
                 })
         }
         else{
-            console.log('Mot de passe incorrecte');
             res.status(401).json('Mot de passe incorrecte');
         }
     }
     else{
-        console.log('Email incorrecte')
         res.status(401).json('Email incorrecte')
     }
 }
@@ -81,42 +75,37 @@ exports.login = (req, res, next) => {
         var searchQuery = mysql.format(sqlSearchEmail, [req.body.email]);
         db.query(searchQuery, (err,data) => {
             const dbUserPw = data[0].password;
+            const dbUserId = data[0].id;
             if(err){
-                console.log('Search query failed');
                 throw err;
             }
             if(data.length = 0){
-                console.log("Cet utilisateur n'existe pas");
                 res.status(409).json("Cet utilisateur n'existe pas")
             }
             else{
                 bcrypt.compare(req.body.password, dbUserPw)
                 .then(valid => {
                     if(!valid){
-                        return res.status(401).json({
-                            error: 'Identifiants incorrects !'
-                        })
+                        return res.status(401).json('Identifiants incorrects !')
                     }
                     res.status(200).json({
-                        userId: dbUserPw,
+                        userId: dbUserId,
                         token: jwt.sign(
-                            {userId: dbUserPw},
+                            {userId: dbUserId},
                             `${process.env.TOKENKEY}`,
                             {expiresIn: '24h'}
                         )
                     })
                 })
                 .catch(error => {
-                    console.log(error);
                     return res.status(500).json({
-                        error
+                        message : error
                     })
                 })
             }
         })
     }
     else{
-        console.log('Email incorrecte')
         res.status(401).json('Email incorrecte')
     }
 }

@@ -6,13 +6,14 @@ const path = require('path');
 const app = express();
 app.use(express.json());
 const userRoutes = require('./routes/user');
-//const sauceRoutes = require('./routes/sauce');
+const postRoutes = require('./routes/post');
 
 // sécurisation des header avec helmet
 app.use(helmet());
 
 // indique les routes à suivre
-//app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/api/auth', userRoutes);
+app.use('/api/posts', postRoutes);
 
 module.exports = app;
