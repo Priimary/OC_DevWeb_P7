@@ -10,6 +10,7 @@ const postRoutes = require('./routes/post');
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-type');
     next();
 });
 // sécurisation des header avec helmet

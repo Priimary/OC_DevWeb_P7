@@ -32,6 +32,7 @@ function Header(){
             <StyledLink to='/'><LogoImg src={`${Logo}`} alt="Logo Groupomania"/></StyledLink>
             <StyledLink to='/connexion'>Connexion</StyledLink>
             <StyledLink to='/disconnect' $isRight>Déconnexion</StyledLink>
+            <StyledLink to='/signup'>Inscription</StyledLink>
         </HeaderContainer>
     )
 }

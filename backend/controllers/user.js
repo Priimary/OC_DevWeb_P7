@@ -37,7 +37,7 @@ exports.signup = (req, res, next) => {
                             throw err;
                         }
                         if(data.length != 0){
-                            res.status(409).json('Cet email existe déjà.')
+                            res.status(409).json({error: 'Cet email existe déjà.'})
                         }
                         else{
                             var sqlInsertUser = 'INSERT INTO users VALUES (DEFAULT, ?, ?)';
@@ -51,7 +51,7 @@ exports.signup = (req, res, next) => {
                                     if(err){
                                         throw err;
                                     }
-                                    res.status(201).json('Bienvenue !')
+                                    res.status(201).json({ message:'Bienvenue !'})
                                 })
                             })
                         }
@@ -62,11 +62,11 @@ exports.signup = (req, res, next) => {
                 })
         }
         else{
-            res.status(401).json('Mot de passe incorrecte.');
+            res.status(401).json({error: 'Mot de passe incorrecte.'});
         }
     }
     else{
-        res.status(401).json('Email incorrecte.')
+        res.status(401).json({error: 'Email incorrecte.'})
     }
 };
 
@@ -83,13 +83,13 @@ exports.login = (req, res, next) => {
                 throw err;
             }
             if(data.length = 0){
-                res.status(409).json("Cet utilisateur n'existe pas")
+                res.status(409).json({error:"Cet utilisateur n'existe pas"})
             }
             else{
                 bcrypt.compare(req.body.password, dbUserPw)
                 .then(valid => {
                     if(!valid){
-                        return res.status(401).json('Identifiants incorrects !')
+                        return res.status(401).json({error:'Identifiants incorrectes !'})
                     }
                     res.status(200).json({
                         userId: dbUserId,
@@ -102,13 +102,13 @@ exports.login = (req, res, next) => {
                 })
                 .catch(error => {
                     return res.status(500).json({
-                        message : error
+                        error : error
                     })
                 })
             }
         })
     }
     else{
-        res.status(401).json('Email incorrecte')
+        res.status(401).json({error:'Identifiants incorrectes !'})
     }
 }
