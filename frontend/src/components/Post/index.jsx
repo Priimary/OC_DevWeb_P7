@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import colors from '../../utils/style/colors';
 
+
 const PostTitle = styled.h2`
     color: #5843e4;
     font-size: 22px;

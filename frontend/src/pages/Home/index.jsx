@@ -2,6 +2,8 @@ import Post from '../../components/Post';
 import styled from 'styled-components';
 import {useEffect, useState} from 'react';
 import { Loader } from '../../utils/style/Atoms'
+import { Navigate } from 'react-router-dom';
+
 
 const PageTitle = styled.h1`
     text-align: center;
@@ -28,12 +30,17 @@ function Posts(){
     const [isDataLoading, setDataLoading] = useState(false);
     const [postsList, setPostsList] = useState([]);
     const [error, setError] = useState(false);
+    const [redirect, setRedirect] = useState(false);
 
     useEffect(() => {
-        async function fetchPosts(){
+        async function fetchPosts(token){
             setDataLoading(true);
             try{
-                const response = await fetch(`http://localhost:3000/api/posts`);
+                const response = await fetch(`http://localhost:3000/api/posts`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
                 const postsList = await response.json();
                 setPostsList(postsList);
             }
@@ -45,7 +52,22 @@ function Posts(){
                 setDataLoading(false);
             }
         }
-        fetchPosts()
+
+        const userStr = localStorage.getItem('user');
+        if(!userStr){
+            setRedirect(true)
+        }
+        else{
+            const user = JSON.parse(userStr);
+            const now = new Date();
+            if(now.getTime() > user.expiry){
+                localStorage.removeItem('user');
+                setRedirect(true);
+            }
+            else{
+                fetchPosts(user.token)
+            }
+        }
     }, []);
     
     if(error){
@@ -54,7 +76,7 @@ function Posts(){
 
     return(
         <PageContainer>
-            <PageTitle>Liste des posts</PageTitle>
+            {redirect ? <Navigate to="/connexion"/> : <PageTitle>Liste des posts</PageTitle> }
             {isDataLoading ? (
                 <LoaderWrapper>
                     <Loader/>
@@ -76,5 +98,6 @@ function Posts(){
         </PageContainer>
     )
 }
+
 
 export default Posts

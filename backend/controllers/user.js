@@ -91,18 +91,21 @@ exports.login = (req, res, next) => {
                     if(!valid){
                         return res.status(401).json({error:'Identifiants incorrectes !'})
                     }
+                    const now = new Date();
+                    const expirationTime = 3600000;
                     res.status(200).json({
                         userId: dbUserId,
                         token: jwt.sign(
                             {userId: dbUserId},
                             `${process.env.TOKENKEY}`,
                             {expiresIn: '24h'}
-                        )
+                        ),
+                        expiry: now.getTime() + expirationTime
                     })
                 })
-                .catch(error => {
+                .catch(err => {
                     return res.status(500).json({
-                        error : error
+                        error: err
                     })
                 })
             }

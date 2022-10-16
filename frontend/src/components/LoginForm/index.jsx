@@ -1,7 +1,10 @@
 import styled from 'styled-components';
 import colors from '../../utils/style/colors';
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import {useState, useEffect} from 'react';
+import {Navigate} from 'react-router-dom';
+import {useSelector, useDispatch} from 'react-redux';
+import {login} from '../../features/auth/authSlice'
+
 
 const LoginContainer = styled.div`
     display: flex;
@@ -23,6 +26,15 @@ function Login(){
     const [inputs, setInputs] = useState({});
     const [error, setError] = useState("");
     const [redirect, setRedirect] = useState(false);
+    const dispatch = useDispatch();
+    const storeConnected = useSelector((state) => state.auth.value);
+
+    // handle auth
+    useEffect(() => {
+        if(storeConnected){
+            setRedirect(true);
+        }
+    }, [storeConnected]);
     
     const handleChange = (e) => {
         const name = e.target.name;
@@ -30,7 +42,7 @@ function Login(){
         setInputs(values => ({...values, [name]: value}))
     };
 
-    const handleSubmit = (e) => {
+    const HandleSubmit = (e) => {
         e.preventDefault();
         setError("");
         fetch('http://localhost:3000/api/auth/login', {
@@ -46,7 +58,9 @@ function Login(){
                 setError(data);
             }
             else{
-                setRedirect(true);
+                localStorage.setItem('user', JSON.stringify(data));
+                dispatch(login())
+                setRedirect(true);   
             }
         })
         .catch((err) => {console.log(err)})
@@ -54,11 +68,11 @@ function Login(){
 
     return(
         <LoginContainer>
-            <StyledForm method="post" onSubmit={handleSubmit}>
+            <StyledForm method="post" onSubmit={HandleSubmit}>
                 <label>Email :</label>
-                <input type="email" name="email" value={inputs.email || ""} onChange={handleChange}/>
+                <input type="email" name="email" value={inputs.email || ""} onChange={handleChange} placeholder="test@gmail.com" required/>
                 <label>Mot de passe :</label>
-                <input type="password" name="password" value={inputs.password || ""} onChange={handleChange}/>
+                <input type="password" name="password" value={inputs.password || ""} onChange={handleChange} required/>
                 {error ? <p>{error.error}</p> : null}
                 {redirect ? <Navigate replace to="/"/> : null}
                 <input value="CONNEXION" type="submit"/>

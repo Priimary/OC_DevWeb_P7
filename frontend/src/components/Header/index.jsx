@@ -1,7 +1,10 @@
-import {Link} from 'react-router-dom';
+import {Link, Navigate} from 'react-router-dom';
 import styled from 'styled-components';
 import colors from '../../utils/style/colors';
 import Logo from '../../assets/icon-left-font-monochrome-black2.png';
+import { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import {logout, login} from '../../features/auth/authSlice'
 
 const StyledLink = styled(Link)`
     padding: 15px;
@@ -26,13 +29,44 @@ const HeaderContainer = styled.nav`
     height: 100px;
 `;
 
+
+
 function Header(){
+    const [isConnected, setIsConnected] = useState(false);
+    const [redirect, setRedirect] = useState(false);
+    const storeConnected = useSelector((state) => state.auth.value)
+    const dispatch = useDispatch();
+
+    // handle auth
+    useEffect(() => {
+        if(storeConnected === false){
+            setIsConnected(false);
+        }
+        const userStr = localStorage.getItem('user');
+        if(userStr){
+            const user = JSON.parse(userStr);
+            const now = new Date();
+            if(now.getTime() > user.expiry){
+                dispatch(logout());
+                setRedirect(true);
+            }
+            else{
+                setIsConnected(true);
+                dispatch(login());
+            }
+        }
+    }, [storeConnected, dispatch]);
+    
+    const handleLogout = () => {
+        dispatch(logout());
+        setIsConnected(false);
+    }
+    
     return(
         <HeaderContainer>
+            {redirect ? (<Navigate to="/connexion"/>) : null}
             <StyledLink to='/'><LogoImg src={`${Logo}`} alt="Logo Groupomania"/></StyledLink>
-            <StyledLink to='/connexion'>Connexion</StyledLink>
-            <StyledLink to='/disconnect' $isRight>Déconnexion</StyledLink>
-            <StyledLink to='/signup'>Inscription</StyledLink>
+            {isConnected ? (<StyledLink to='/connexion' onClick={handleLogout} $isRight>Déconnexion</StyledLink>) : null}
         </HeaderContainer>
     )
 }
