@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import colors from '../../utils/style/colors';
+import { Link } from 'react-router-dom';
 
 
 const PostTitle = styled.h2`
@@ -18,9 +19,10 @@ const PostImg = styled.img`
     }
 `
 
-const PostWrapper = styled.div`
+const PostWrapper = styled(Link)`
     display: flex;
     flex-direction: column;
+    text-decoration: none;
     padding: 15px;
     background-color: ${colors.backgroundLight};
     border-radius: 30px;
@@ -30,10 +32,10 @@ const PostWrapper = styled.div`
         box-shadow: 2px 2px 10px #e2e3e9;
     }
 `
-function Post({title, content, imgUrl, createdAt, updatedAt}){
+function Post({postId, title, content, imgUrl, createdAt, updatedAt}){
 
     return(
-        <PostWrapper>
+        <PostWrapper to={"/post/" + postId}>
             <PostTitle>{title}</PostTitle>
             <span>{content}</span>
             {imgUrl != null ? 
@@ -47,6 +49,7 @@ function Post({title, content, imgUrl, createdAt, updatedAt}){
 }
 
 Post.propTypes = {
+    postId: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
     content: PropTypes.string.isRequired,
     imgUrl: PropTypes.string,

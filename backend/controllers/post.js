@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 
 // récupère tous les posts de la table posts et les trie par leur date de création
 exports.getAllPosts = (req, res, next) => {
-    var sqlSearchPosts = 'SELECT * FROM posts ORDER BY createdAt';
+    var sqlSearchPosts = 'SELECT * FROM posts ORDER BY createdAt DESC';
     db.query(sqlSearchPosts, (err,posts) => {
         if(err){
             throw err;
@@ -44,21 +44,21 @@ exports.addPost = (req, res, next) => {
                     }
                     throw err
                 }
-                res.status(201).json('Votre post a bien été ajouté !')
+                res.status(201).json({message: 'Votre post a bien été ajouté !'})
             })
         }
         else{
             if(req.file.filename){
                 fs.unlinkSync(`images/${req.file.filename}`)
             }
-            res.status(401).json('Contenu du texte incorrecte.')
+            res.status(401).json({error: 'Contenu du texte incorrecte.'})
         }
     }
     else{
         if(req.file.filename){
             fs.unlinkSync(`images/${req.file.filename}`)
         }
-        res.status(401).json('Titre incorrecte.')
+        res.status(401).json({error: 'Titre incorrecte.'})
     }
 };
 
@@ -159,11 +159,11 @@ exports.deletePost = (req, res, next) => {
                     if(err){
                         throw err
                     }
-                    res.status(200).json('Ce post a bien été supprimé')
+                    res.status(200).json({message : 'Ce post a bien été supprimé'})
                 })
             }
             else{
-                res.status(403).json('Accès non autorisé.')
+                res.status(403).json({error : 'Accès non autorisé.'})
             }
         })
     })  

@@ -1,9 +1,8 @@
-import Post from '../../components/Post'; 
+import Post from '../../components/FullPost'; 
 import styled from 'styled-components';
-import NewPostBtn from '../../components/NewPost'
 import {useEffect, useState} from 'react';
-import {Loader} from '../../utils/style/Atoms'
-import {Navigate} from 'react-router-dom';
+import { Loader } from '../../utils/style/Atoms'
+import { Navigate, useParams} from 'react-router-dom';
 
 
 const PageTitle = styled.h1`
@@ -27,24 +26,25 @@ const LoaderWrapper = styled.div`
     justify-content: center;
 `
 
-
-function Home(){
+function FullPost(){
     const [isDataLoading, setDataLoading] = useState(true);
-    const [postsList, setPostsList] = useState([]);
+    const [post, setPost] = useState([]);
     const [error, setError] = useState(false);
     const [redirect, setRedirect] = useState(false);
-    const user = JSON.parse(localStorage.getItem('user'));
+    const {id} = useParams();
+    const userStr = localStorage.getItem('user');
+    const user = JSON.parse(userStr);
 
     useEffect(() => {
-        async function fetchPosts(token){
+        async function fetchPost(token){
             try{
-                const response = await fetch(`http://localhost:3000/api/posts`, {
+                const response = await fetch(`http://localhost:3000/api/posts/${id}`, {
                     headers: {
                         'Authorization': 'Bearer ' + token
                     }
                 });
-                const postsList = await response.json();
-                setPostsList(postsList);
+                const post = await response.json();
+                setPost(post[0]);
             }
             catch(err){
                 console.log(err,'ERROR');
@@ -55,24 +55,22 @@ function Home(){
             }
         }
         setDataLoading(true);
-        const userStr = localStorage.getItem('user');
         if(!userStr){
             setRedirect(true)
         }
         else{
-            const user = JSON.parse(userStr);
             const now = new Date();
             if(now.getTime() > user.expiry){
                 localStorage.removeItem('user');
                 setRedirect(true);
             }
             else{
-                fetchPosts(user.token)
+                fetchPost(user.token)
             }
         }
 
     }, []);
-
+    
     if(error){
         return <span>Oups il y a un problème</span>
     }
@@ -85,20 +83,20 @@ function Home(){
                     <Loader/>
                 </LoaderWrapper>
             ) : (<>
-                    <PageTitle>Liste des posts</PageTitle>
-                    <NewPostBtn tokenAuth={user.token} />
+                    <PageTitle>Post n°{post.id}</PageTitle>
                     <PostsContainer>
-                        {postsList.map((post, index) => (
                             <Post
                                 key={`${post.title}-${post.id}`}
                                 postId={post.id}
+                                postUserId={post.User_id}
+                                userId={user.userId}
+                                tokenAuth={user.token}
                                 content={post.content}
                                 imgUrl={post.imgUrl}
                                 title={post.title}
                                 createdAt={post.createdAt}
                                 updatedAt={post.updatedAt}
                             />
-                        ))}
                     </PostsContainer>
                 </>
             )}
@@ -107,4 +105,4 @@ function Home(){
 }
 
 
-export default Home
+export default FullPost

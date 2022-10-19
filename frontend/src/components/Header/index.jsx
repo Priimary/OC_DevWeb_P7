@@ -65,7 +65,7 @@ function Header(){
     return(
         <HeaderContainer>
             {redirect ? (<Navigate to="/connexion"/>) : null}
-            <StyledLink to='/'><LogoImg src={`${Logo}`} alt="Logo Groupomania"/></StyledLink>
+            {isConnected ? (<StyledLink to='/'><LogoImg src={`${Logo}`} alt="Logo Groupomania"/></StyledLink>) : (<StyledLink to='/connexion'><LogoImg src={`${Logo}`} alt="Logo Groupomania"/></StyledLink>)}
             {isConnected ? (<StyledLink to='/connexion' onClick={handleLogout} $isRight>Déconnexion</StyledLink>) : null}
         </HeaderContainer>
     )
