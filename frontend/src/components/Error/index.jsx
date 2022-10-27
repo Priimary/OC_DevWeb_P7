@@ -1,8 +1,17 @@
+import styled from "styled-components";
+
+const PageContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-bottom: 50px;
+`
+
 function Error(){
     return(
-        <div>
+        <PageContainer>
             <h1>Oups, cette page n'existe pas !</h1>
-        </div>
+        </PageContainer>
     )
 }
 

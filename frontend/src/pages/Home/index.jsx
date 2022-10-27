@@ -1,24 +1,22 @@
-import Post from '../../components/Post'; 
+import Post from '../../components/Post';
+import colors from '../../utils/style/colors'
 import styled from 'styled-components';
 import NewPostBtn from '../../components/NewPost'
 import {useEffect, useState} from 'react';
 import {Loader} from '../../utils/style/Atoms'
 import {Navigate} from 'react-router-dom';
 
-
-const PageTitle = styled.h1`
-    text-align: center;
-`
-
 const PageContainer = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
+    padding-bottom: 50px;
 `
+
 const PostsContainer = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 40px;
     margin: auto;
     width: 1000px;
 `
@@ -35,6 +33,9 @@ function Home(){
     const [redirect, setRedirect] = useState(false);
     const user = JSON.parse(localStorage.getItem('user'));
 
+    // vérifie si l'utilisateur est connecté en regardant dans le localstorage/store redux
+    // si pas connecté, redirige vers la page de connexion
+    // sinon recupère la liste des posts depuis l'api
     useEffect(() => {
         async function fetchPosts(token){
             try{
@@ -53,6 +54,7 @@ function Home(){
             finally{
                 setDataLoading(false)
             }
+            
         }
         setDataLoading(true);
         const userStr = localStorage.getItem('user');
@@ -67,7 +69,7 @@ function Home(){
                 setRedirect(true);
             }
             else{
-                fetchPosts(user.token)
+                fetchPosts(user.token);
             }
         }
 
@@ -85,8 +87,8 @@ function Home(){
                     <Loader/>
                 </LoaderWrapper>
             ) : (<>
-                    <PageTitle>Liste des posts</PageTitle>
-                    <NewPostBtn tokenAuth={user.token} />
+                    <h1>Liste des posts</h1>
+                    <NewPostBtn tokenAuth={user.token}/>
                     <PostsContainer>
                         {postsList.map((post, index) => (
                             <Post

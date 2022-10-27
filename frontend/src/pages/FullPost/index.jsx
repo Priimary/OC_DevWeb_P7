@@ -1,25 +1,30 @@
-import Post from '../../components/FullPost'; 
+import Post from '../../components/FullPost';
+import colors from '../../utils/style/colors';
 import styled from 'styled-components';
 import {useEffect, useState} from 'react';
 import { Loader } from '../../utils/style/Atoms'
 import { Navigate, useParams} from 'react-router-dom';
 
+const PageContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: ${colors.secondary};
+    padding-bottom: 50px;
+    margin: 0;
+`
 
 const PageTitle = styled.h1`
     text-align: center;
 `
 
-const PageContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-`
+
 const PostsContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 30px;
     margin: auto;
-    width: 1000px;
+    width: 100%;
 `
 const LoaderWrapper = styled.div`
     display: flex;
@@ -31,6 +36,7 @@ function FullPost(){
     const [post, setPost] = useState([]);
     const [error, setError] = useState(false);
     const [redirect, setRedirect] = useState(false);
+    const [postUpdated, setPostUpdated] = useState(false);
     const {id} = useParams();
     const userStr = localStorage.getItem('user');
     const user = JSON.parse(userStr);
@@ -54,6 +60,7 @@ function FullPost(){
                 setDataLoading(false)
             }
         }
+        setPostUpdated(false);
         setDataLoading(true);
         if(!userStr){
             setRedirect(true)
@@ -69,7 +76,7 @@ function FullPost(){
             }
         }
 
-    }, []);
+    }, [id, user.expiry, user.token, userStr, postUpdated]);
     
     if(error){
         return <span>Oups il y a un problème</span>
@@ -86,16 +93,22 @@ function FullPost(){
                     <PageTitle>Post n°{post.id}</PageTitle>
                     <PostsContainer>
                             <Post
+                                postUpdated={postUpdated}
+                                setPostUpdated={setPostUpdated}
                                 key={`${post.title}-${post.id}`}
                                 postId={post.id}
                                 postUserId={post.User_id}
                                 userId={user.userId}
+                                userRoleId={user.roleId}
                                 tokenAuth={user.token}
                                 content={post.content}
                                 imgUrl={post.imgUrl}
                                 title={post.title}
                                 createdAt={post.createdAt}
                                 updatedAt={post.updatedAt}
+                                likes={parseInt(post.likes)}
+                                dislikes={parseInt(post.dislikes)}
+                                userLike={post.userLike}
                             />
                     </PostsContainer>
                 </>

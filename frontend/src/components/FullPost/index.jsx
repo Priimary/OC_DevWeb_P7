@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import colors from '../../utils/style/colors';
 import {useState} from 'react';
 import {Navigate} from 'react-router-dom';
+import ModifyPost from '../ModifyPostForm'
+import LikesDislikes from '../LikesDislikes';
 
 
 const PostTitle = styled.h2`
@@ -32,18 +34,13 @@ const PostWrapper = styled.div`
         box-shadow: 2px 2px 10px #e2e3e9;
     }
 `
-function FullPost({postId, postUserId, userId, tokenAuth, title, content, imgUrl, createdAt, updatedAt}){
-    const [openModifyDialog, setOpenModifyDialog] = useState(false);
+function FullPost({postId, postUserId, userId, userRoleId, tokenAuth, title, content, imgUrl, createdAt, updatedAt, likes, dislikes, userLike, postUpdated, setPostUpdated}){
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [redirect, setRedirect] = useState(false);
     const [error, setError] = useState("");
 
     const handleRedirect = () => {
         setRedirect(true)
-    }
-
-    const handleModify = () => {
-        setOpenModifyDialog(true);
     }
 
     const handleDelete = () => {
@@ -77,10 +74,20 @@ function FullPost({postId, postUserId, userId, tokenAuth, title, content, imgUrl
             </a>) : null}
             <p>Post créé le : {createdAt}</p>
             {updatedAt !== createdAt ? <p>Modifié le : {updatedAt}</p> : null}
-            {postUserId === userId ? (<>
-                <button onClick={handleModify}>Modify</button>
+            <LikesDislikes postId={postId} 
+                            tokenAuth={tokenAuth} 
+                            likes={likes} 
+                            dislikes={dislikes} 
+                            userLike={userLike}/>
+            {postUserId === userId || userRoleId === 1 ? (<>
+                <ModifyPost postId={postId}
+                            tokenAuth={tokenAuth}
+                            content={content}
+                            imgUrl={imgUrl}
+                            title={title}
+                            postUpdated={postUpdated}
+                            setPostUpdated={setPostUpdated}/>
                 <button onClick={handleDelete}>Delete</button>
-                <dialog open={openModifyDialog}><p>coucou</p></dialog>
                 <dialog open={openDeleteDialog}><p>{error.message || error.error}</p><button onClick={handleRedirect}>OK</button></dialog>
             </>)
             : null}

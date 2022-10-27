@@ -1,33 +1,152 @@
 import styled from 'styled-components';
 import colors from '../../utils/style/colors';
-import { useState} from 'react';
+import {useState} from 'react';
 import {Navigate} from 'react-router-dom';
+
+const StyledAddBtn = styled.button`
+    align-self: center;
+    margin-bottom: 50px;
+    width: 100px;
+    padding: 10px 0;
+    color: ${colors.tertiary};
+    background-color: ${colors.backgroundColor};
+    box-shadow: 0 1px 1px ${colors.tertiary};
+    border: 1px solid ${colors.tertiary};
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 200ms;
+    &:hover{
+        cursor: pointer;
+        box-shadow: 0 2px 2px 2px ${colors.tertiary};
+    }
+`
+
+const StyledAddIcon = styled.i`
+    margin-right: 5px;
+`
+
+const StyledCloseBtn = styled.button`
+    position: absolute;
+    right: 15px;
+    color: ${colors.tertiary};
+    background-color: ${colors.backgroundColor};
+    border: 1px solid ${colors.tertiary};
+    border-radius: 15px;
+    transition: 200ms;
+    &:hover{
+        cursor: pointer;
+        box-shadow: 0 1px 1px 1px ${colors.tertiary};
+    }
+`
+
+const StyledXMarkIcon = styled.i`
+    font-size: 20px;
+`
+
+const StyledDialog = styled.dialog`
+    border: 3px solid ${colors.primary};
+    box-shadow: 0 1px 5px 1px ${colors.tertiary};
+    background-color: ${colors.secondary};
+    border-radius: 10px;
+    position: fixed;
+    top: 30px;
+    padding: 20px;
+`
 
 const StyledForm = styled.form`
     display: flex;
     flex-direction: column;
-    width: 500px;
     align-items: center;
-    border: 1px solid black;
     gap: 15px;
-    padding: 20px 0;
 `
+
+const StyledLabel = styled.label`
+    color: ${colors.tertiary};
+    font-size: 18px;
+    text-decoration: underline;
+    font-weight: bold;
+`
+
+const StyledInputTitle = styled.input`
+    color: ${colors.tertiary};
+    font-size: 18px;
+    background-color: ${colors.backgroundColor};
+    border: 1px solid ${colors.tertiary};
+    border-radius: 5px;
+    width: 400px;
+`
+
+const StyledInputContent = styled.textarea`
+    color: ${colors.tertiary};
+    font-size: 18px;
+    background-color: ${colors.backgroundColor};
+    border: 1px solid ${colors.tertiary};
+    border-radius: 5px;
+    width: 600px;
+    height: 100px;
+`
+
+const StyledSubmitImg = styled.input`
+    color: ${colors.tertiary};
+    background-color: ${colors.backgroundColor};
+    border: 1px solid ${colors.tertiary};
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-weight: bold;
+    transition: 200ms;
+    &:hover{
+        cursor: pointer;
+        box-shadow: 0 1px 2px 1px ${colors.tertiary};
+    }
+`
+
+const StyledSubmit = styled.input`
+    color: ${colors.tertiary};
+    background-color: ${colors.backgroundColor};
+    border: 1px solid ${colors.tertiary};
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: 200ms;
+    &:hover{
+        cursor: pointer;
+        box-shadow: 0 1px 2px 1px ${colors.tertiary};
+    }
+`
+
+const ErrorMsg = styled.p`
+    border: 1px solid ${colors.tertiary};
+    box-shadow: 0 1px 1px 1px ${colors.tertiary};
+    border-radius: 5px;
+    background-color: ${colors.primary};
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    padding: 5px 20px;
+`
+
 function NewPost({tokenAuth}){
     const [inputs, setInputs] = useState({});
-    const [image, setImage] = useState({});
+    const [image, setImage] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
+    const [postId, setPostId] = useState("");
     const [error, setError] = useState("");
-    const [confirmation, setConfirmation] = useState(false);
-    const [redirection, setRedirection] = useState(false)
+    const [redirection, setRedirection] = useState(false);
 
+    // ouvre/ferme le dialog à l'appuie sur le bouton
     const handleDialog = () => {
-        setOpenDialog(true)
+        if(openDialog){
+            setOpenDialog(false)
+        }
+        else{
+            setOpenDialog(true)
+        }
     }
 
-    const handleRedirection = () => {
-        setRedirection(true);
-    }
-
+    // récupère les inputs dans un objet suivant le schéma key:value
     const handleChangeInputs = (e) => {
         const name = e.target.name;
         const value = e.target.value;
@@ -39,12 +158,17 @@ function NewPost({tokenAuth}){
         setImage(value);
     }
 
+    // reset le message d'erreur, puis créé un objet FormData contenant les inputs et la possible image
+    // envoie l'objet à l'api, puis si tout est bon redirige sur la page du post entier
+    // sinon affiche le message d'erreur
     const handleSubmit = (e) => {
         setError("");
         e.preventDefault();
         const formData = new FormData();
         formData.append('post', JSON.stringify(inputs));
-        formData.append('image', image);
+        if(image){
+            formData.append('image', image)
+        }
         fetch('http://localhost:3000/api/posts', {
             method: 'POST',
             headers: {
@@ -55,11 +179,11 @@ function NewPost({tokenAuth}){
         .then((res) => res.json())
         .then((data) => {
             if(data.error){
-                setError(data)
+                setError(data);
             }
             else{
-                setError(data)
-                setConfirmation(true);
+                setPostId(data.postId);
+                setRedirection(true);
             }
          })
         .catch((err) => {console.log(err, 'ERR')})
@@ -67,26 +191,30 @@ function NewPost({tokenAuth}){
 
     return(
         <>
-        {redirection ? <Navigate replace to="/"/> : null}
-        <button onClick={handleDialog}>CRÉÉ UN POST</button>
-        <dialog open={openDialog}>
-            {confirmation ? 
-            (<><p>{error.message}</p><button onClick={handleRedirection}>OK</button></>)
-            : (
-                <StyledForm method="post" onSubmit={handleSubmit}>
-                    <label>Titre du post :</label>
-                    <input type="Titre" name="title" value={inputs.title || ""} onChange={handleChangeInputs} required/>
+        {redirection ? <Navigate to={'/post/' + postId}/> : null}
+
+        <StyledAddBtn onClick={handleDialog}><StyledAddIcon className="fa-solid fa-plus"/>POST</StyledAddBtn>
+
+        <StyledDialog open={openDialog}>
+
+            <StyledCloseBtn onClick={handleDialog}><StyledXMarkIcon className="fa-solid fa-xmark"/></StyledCloseBtn>
+
+            <StyledForm method="post" onSubmit={handleSubmit}>
+                <StyledLabel>Titre du post :</StyledLabel>
+                <StyledInputTitle type="text" name="title" value={inputs.title || ""} onChange={handleChangeInputs} required/>
                         
-                    <label>Veuillez écrire votre message :</label>
-                    <input type="text" name="content" value={inputs.content || ""} onChange={handleChangeInputs} required/>
+                <StyledLabel>Veuillez écrire votre message :</StyledLabel>
+                <StyledInputContent type="textarea" name="content" value={inputs.content || ""} onChange={handleChangeInputs} required/>
                         
-                    <label>Choisissez l'image que vous souhaitez envoyer :</label>
-                    <input type="file" name="image" onChange={handleChangeImage} accept="image/png, image/jpeg, image/jpg"/>
-                    {error ? <p>{error.error}</p> : null}
-                    <input type="submit"/>
-                </StyledForm>
-            )}
-        </dialog>
+                <StyledLabel>Choisissez l'image que vous souhaitez envoyer :</StyledLabel>
+                <StyledSubmitImg type="file" name="image" onChange={handleChangeImage} accept="image/png, image/jpeg, image/jpg"/>
+
+                {error ? <ErrorMsg>{error.error}</ErrorMsg> : null}
+
+                <StyledSubmit type="submit"/>
+            </StyledForm>
+
+        </StyledDialog>
         </>
     )
 }

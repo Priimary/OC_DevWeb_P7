@@ -1,15 +1,19 @@
 import Signup from '../../components/SignupForm';
 import styled from 'styled-components';
 
-const StyledTitle = styled.h1`
-    text-align: center;
+const PageContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-bottom: 50px;
 `
+
 function Inscription(){
     return(
-        <div>
-            <StyledTitle>INSCRIPTION</StyledTitle>
+        <PageContainer>
+            <h1>INSCRIPTION</h1>
             <Signup/>
-        </div>
+        </PageContainer>
     )
 }
 

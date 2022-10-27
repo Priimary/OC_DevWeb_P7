@@ -62,11 +62,11 @@ exports.signup = (req, res, next) => {
                 })
         }
         else{
-            res.status(401).json({error: 'Mot de passe incorrecte.'});
+            res.status(401).json({error:"Format du mot de passe incorrecte."});
         }
     }
     else{
-        res.status(401).json({error: 'Email incorrecte.'})
+        res.status(401).json({error:"Format de l'email incorrecte."})
     }
 };
 
@@ -74,27 +74,29 @@ exports.signup = (req, res, next) => {
 // compare les mdp, si tout est bon créé un token jwt
 exports.login = (req, res, next) => {
     if(ValidateEmail(req.body.email)){
-        var sqlSearchEmail = 'SELECT * FROM users WHERE email = ?';
+        var sqlSearchEmail = 'SELECT u.*, ur.Role_id FROM users u INNER JOIN users_roles ur ON u.id = ur.User_id WHERE email = ?';
         var searchQuery = mysql.format(sqlSearchEmail, [req.body.email]);
         db.query(searchQuery, (err,data) => {
-            const dbUserPw = data[0].password;
-            const dbUserId = data[0].id;
             if(err){
                 throw err;
             }
-            if(data.length = 0){
-                res.status(409).json({error:"Cet utilisateur n'existe pas"})
+            if(data.length === 0){
+                res.status(409).json({error:"Identifiants incorrectes !"})
             }
             else{
+                const dbUserPw = data[0].password;
+                const dbUserId = data[0].id;
+                const dbUserRoleId = data[0].Role_id
                 bcrypt.compare(req.body.password, dbUserPw)
                 .then(valid => {
                     if(!valid){
                         return res.status(401).json({error:'Identifiants incorrectes !'})
                     }
                     const now = new Date();
-                    const expirationTime = 3600000;
+                    const expirationTime = 86400000;
                     res.status(200).json({
                         userId: dbUserId,
+                        roleId: dbUserRoleId,
                         token: jwt.sign(
                             {userId: dbUserId},
                             `${process.env.TOKENKEY}`,
@@ -112,6 +114,6 @@ exports.login = (req, res, next) => {
         })
     }
     else{
-        res.status(401).json({error:'Identifiants incorrectes !'})
+        res.status(401).json({error:"Format de l'email incorrecte."})
     }
 }

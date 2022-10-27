@@ -16,8 +16,8 @@ exports.getAllPosts = (req, res, next) => {
 
 // récupère un post grâce à son id récupéré depuis les params de l'url depuis la table posts
 exports.getOnePost = (req, res, next) => {
-    var sqlSearchPost = 'SELECT * FROM posts WHERE id = ?';
-    var SearchPost = mysql.format(sqlSearchPost, [req.params.id]);
+    var sqlSearchPost = "SELECT p.*, coalesce(sum(l.isLike = 1), 0) AS likes, coalesce(sum(l.isLike = 0), 0) AS dislikes, (SELECT isLike FROM likes_dislikes WHERE Post_id = ? AND User_id = ?) AS userLike FROM posts p LEFT JOIN likes_dislikes l ON p.id = l.Post_id WHERE p.id = ?";
+    var SearchPost = mysql.format(sqlSearchPost, [req.params.id, req.auth.userId, req.params.id]);
     db.query(SearchPost, (err,post) => {
         if(err){
             throw err;
@@ -39,23 +39,23 @@ exports.addPost = (req, res, next) => {
             var insertUserQuery = mysql.format(sqlInsertUser, [req.auth.userId, postObject.title, postObject.content, postObject.imgUrl]);
             db.query(insertUserQuery, (err,data) => {
                 if(err){
-                    if(req.file.filename){
+                    if(req.file){
                         fs.unlinkSync(`images/${req.file.filename}`)
                     }
                     throw err
                 }
-                res.status(201).json({message: 'Votre post a bien été ajouté !'})
+                res.status(201).json({message: 'Votre post a bien été ajouté !', postId: data.insertId})
             })
         }
         else{
-            if(req.file.filename){
+            if(req.file){
                 fs.unlinkSync(`images/${req.file.filename}`)
             }
-            res.status(401).json({error: 'Contenu du texte incorrecte.'})
+            res.status(401).json({error:'Contenu du texte incorrecte.'})
         }
     }
     else{
-        if(req.file.filename){
+        if(req.file){
             fs.unlinkSync(`images/${req.file.filename}`)
         }
         res.status(401).json({error: 'Titre incorrecte.'})
@@ -78,7 +78,7 @@ exports.modifyPost = (req, res, next) => {
             var SearchAdminUser = mysql.format(sqlSearchAdminUser, [1, req.auth.userId])
             db.query(SearchAdminUser, (err,adminUsers) => {
                 if(err){
-                    if(req.file.filename){
+                    if(req.file){
                         fs.unlinkSync(`images/${req.file.filename}`)
                     }
                     throw err
@@ -87,17 +87,17 @@ exports.modifyPost = (req, res, next) => {
                 var SearchPost = mysql.format(sqlSearchPost, [req.params.id]);
                 db.query(SearchPost, (err,post) => {
                     if(err){
-                        if(req.file.filename){
+                        if(req.file){
                             fs.unlinkSync(`images/${req.file.filename}`)
                         }
                         throw err
                     }
-                    if(post[0].User_id == req.auth.userId || adminUsers.length > 0){
+                    if((post[0].User_id === req.auth.userId || adminUsers.length > 0) && postObject.imgUrl){
                         var sqlUpdatePost = 'UPDATE posts SET title = ?, content = ?, imgUrl = ?, updatedAt = NOW() WHERE id = ?';
                         var UpdatePost = mysql.format(sqlUpdatePost,[postObject.title, postObject.content, postObject.imgUrl, req.params.id]);
                         db.query(UpdatePost, (err,data) => {
                             if(err){
-                                if(req.file.filename){
+                                if(req.file){
                                     fs.unlinkSync(`images/${req.file.filename}`)
                                 }
                                 throw err;
@@ -106,30 +106,43 @@ exports.modifyPost = (req, res, next) => {
                                 const filename = post[0].imgUrl.split('/images/')[1];
                                 fs.unlinkSync(`images/${filename}`)  
                             }
-                            res.status(200).json('Votre post a été modifié !')
+                            res.status(200).json({message:'Votre post a été modifié !'})
+                        })
+                    }
+                    else if((post[0].User_id === req.auth.userId || adminUsers.length > 0) && !postObject.imgUrl){
+                        var sqlUpdatePost = 'UPDATE posts SET title = ?, content = ?, updatedAt = NOW() WHERE id = ?';
+                        var UpdatePost = mysql.format(sqlUpdatePost,[postObject.title, postObject.content, req.params.id]);
+                        db.query(UpdatePost, (err,data) => {
+                            if(err){
+                                if(req.file){
+                                    fs.unlinkSync(`images/${req.file.filename}`)
+                                }
+                                throw err;
+                            }
+                            res.status(200).json({message:'Votre post a été modifié !'})
                         })
                     }
                     else{
-                        if(req.file.filename){
+                        if(req.file){
                             fs.unlinkSync(`images/${req.file.filename}`)
                         }
-                        res.status(403).json('Accès non autorisé.')
+                        res.status(403).json({error:'Accès non autorisé.'})
                     }
                 })
             })
         }
         else{
-            if(req.file.filename){
+            if(req.file){
                 fs.unlinkSync(`images/${req.file.filename}`)
             }
-            res.status(401).json('Contenu du texte incorrecte')
+            res.status(401).json({error:'Contenu du texte incorrecte'})
         }
     }   
     else{
-        if(req.file.filename){
+        if(req.file){
             fs.unlinkSync(`images/${req.file.filename}`)
         }
-        res.status(401).json('Titre incorrecte')
+        res.status(401).json({error:'Titre incorrecte'})
     }
 };
 
@@ -174,7 +187,7 @@ exports.deletePost = (req, res, next) => {
 // si oui : update le vote avec la valeur reçue (1=like, 0=dislike, -1=suppression)
 // si non : insert les données dans la table likes_dislikes
 exports.postLike = (req,res,next) => {
-    if(req.body.like == 0 || req.body.like == 1 || req.body.like == -1){
+    if(req.body.like === 0 || req.body.like === 1 || req.body.like === -1){
         var sqlSearchVote = 'SELECT * FROM likes_dislikes WHERE User_id = ? AND Post_id = ?';
         var SearchVote = mysql.format(sqlSearchVote, [req.auth.userId, req.params.id]);
         db.query(SearchVote, (err, vote) => {
@@ -189,7 +202,7 @@ exports.postLike = (req,res,next) => {
                         if(err){
                             throw err
                         }
-                        res.status(200).json('Votre vote a été mis à jour.')
+                        res.status(200).json({message: 'Votre vote a été mis à jour.'})
                     })
                 }
                 else{
@@ -199,23 +212,23 @@ exports.postLike = (req,res,next) => {
                         if(err){
                             throw err
                         }
-                        res.status(200).json('Votre vote a bien été supprimé.')
+                        res.status(200).json({message: 'Votre vote a bien été supprimé.'})
                     })
                 }
             }
             else{
-                var sqlInsertVote = 'INSERT INTO likes_dislikes VALUES (?, ?, ?)';
+                var sqlInsertVote = 'INSERT INTO likes_dislikes VALUES (DEFAULT, ?, ?, ?)';
                 var InsertVote = mysql.format(sqlInsertVote, [req.auth.userId, req.params.id, parseInt(req.body.like)]);
                 db.query(InsertVote, (err,data) => {
                     if(err){
                         throw err
                     }
-                    res.status(201).json('Votre vote a bien été ajouté.')
+                    res.status(201).json({message: 'Votre vote a bien été ajouté.'})
                 })
             }
         })
     }
     else{
-        res.status(401).json('Mauvaises données')
+        res.status(401).json({error: 'Mauvaises données'})
     }
 }

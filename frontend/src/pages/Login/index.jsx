@@ -1,16 +1,20 @@
 import Login from '../../components/LoginForm'
+import colors from '../../utils/style/colors'
 import styled from 'styled-components';
 
-const StyledTitle = styled.h1`
-    text-align: center;
+const PageContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-bottom: 50px;
 `
 
 function Connexion(){
     return(
-        <div>
-            <StyledTitle>CONNEXION</StyledTitle>
+        <PageContainer>
+            <h1>CONNEXION</h1>
             <Login/>
-        </div>
+        </PageContainer>
     )
 }
 
