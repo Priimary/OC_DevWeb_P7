@@ -1,7 +1,6 @@
 import Post from '../../components/Post';
-import colors from '../../utils/style/colors'
 import styled from 'styled-components';
-import NewPostBtn from '../../components/NewPost'
+import NewPostBtn from '../../components/NewPostBtn'
 import {useEffect, useState} from 'react';
 import {Loader} from '../../utils/style/Atoms'
 import {Navigate} from 'react-router-dom';
@@ -16,9 +15,9 @@ const PageContainer = styled.div`
 const PostsContainer = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 40px;
     margin: auto;
-    width: 1000px;
+    gap: 40px;
+    width: 80%;
 `
 const LoaderWrapper = styled.div`
     display: flex;

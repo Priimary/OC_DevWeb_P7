@@ -9,22 +9,19 @@ const PageContainer = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
-    background-color: ${colors.secondary};
     padding-bottom: 50px;
-    margin: 0;
 `
 
 const PageTitle = styled.h1`
     text-align: center;
 `
 
-
-const PostsContainer = styled.div`
+const PostContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 30px;
     margin: auto;
-    width: 100%;
+    width: 90%;
 `
 const LoaderWrapper = styled.div`
     display: flex;
@@ -50,6 +47,9 @@ function FullPost(){
                     }
                 });
                 const post = await response.json();
+                if(post[0].id === null){
+                    setRedirect(true);
+                }
                 setPost(post[0]);
             }
             catch(err){
@@ -91,7 +91,7 @@ function FullPost(){
                 </LoaderWrapper>
             ) : (<>
                     <PageTitle>Post n°{post.id}</PageTitle>
-                    <PostsContainer>
+                    <PostContainer>
                             <Post
                                 postUpdated={postUpdated}
                                 setPostUpdated={setPostUpdated}
@@ -110,7 +110,7 @@ function FullPost(){
                                 dislikes={parseInt(post.dislikes)}
                                 userLike={post.userLike}
                             />
-                    </PostsContainer>
+                    </PostContainer>
                 </>
             )}
         </PageContainer>

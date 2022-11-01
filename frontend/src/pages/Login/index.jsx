@@ -1,5 +1,4 @@
 import Login from '../../components/LoginForm'
-import colors from '../../utils/style/colors'
 import styled from 'styled-components';
 
 const PageContainer = styled.div`

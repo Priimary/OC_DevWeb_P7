@@ -1,98 +1,139 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import colors from '../../utils/style/colors';
-import {useState} from 'react';
-import {Navigate} from 'react-router-dom';
-import ModifyPost from '../ModifyPostForm'
-import LikesDislikes from '../LikesDislikes';
-
-
-const PostTitle = styled.h2`
-    color: #5843e4;
-    font-size: 22px;
-    font-weight: bold;
-`
-const PostImg = styled.img`
-    width: 20%;
-    padding: 5px;
-    border: 1px solid black;
-    border-radius: 5%;
-    &:hover{
-        box-shadow: 0 0 2px 1px black;
-    }
-`
+import ModifyPostBtn from '../ModifyPostBtn'
+import DeletePostBtn from '../DeletePostBtn'
+import LikesDislikesBtn from '../LikesDislikesBtn';
 
 const PostWrapper = styled.div`
     display: flex;
-    flex-direction: column;
-    padding: 15px;
-    background-color: ${colors.backgroundLight};
+    color: ${colors.tertiary};
+    background-color: ${colors.backgroundColor};
+    border: 2px solid ${colors.tertiary};
     border-radius: 30px;
-    transition: 200ms;
-    &:hover{
-        cursor: pointer;
-        box-shadow: 2px 2px 10px #e2e3e9;
+    box-shadow: 0 1px 20px 5px ${colors.tertiary};
+    font-size: 18px;
+    font-weight: bold;
+
+    @media all and (max-width: 768px){
+        flex-direction: column;
     }
 `
+
+const ContentContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+
+    @media all and (max-width: 768px){
+        width: 100%;
+    }
+`
+
+const ButtonsContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 20%;
+    padding: 15px 0;
+    border-left: 5px solid ${colors.primary};
+    box-shadow: -5px 0 ${colors.tertiary};
+
+    @media all and (max-width: 768px){
+        border-left: none;
+        box-shadow: none;
+        width: 100%;
+    }
+`
+
+const PostTitle = styled.h2`
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: ${colors.tertiary};
+    text-transform: uppercase;
+    font-size: 36px;
+    font-weight: bold;
+    margin: 0;
+    padding: 10px 10px 0 10px;
+    border-bottom: 5px solid ${colors.primary};
+    box-shadow: 0 5px ${colors.tertiary};
+
+    @media all and (max-width: 768px){
+        font-size: 30px;
+    }
+`
+
+const PostContent = styled.pre`
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-weight: normal;
+    margin: 0;
+    padding: 10px 30px;
+`
+
+const PostImg = styled.img`
+    border: 1px solid ${colors.tertiary};
+    border-radius: 10px;
+    box-shadow: 0 1px 1px 1px ${colors.tertiary};
+    width: 90%;
+    padding: 2px;
+    margin-bottom: 15px;
+    align-self: center;
+`
+
+const PostDate = styled.p`
+    font-size: 14px;
+    font-weight: normal;
+    border-top: 5px solid ${colors.primary};
+    box-shadow: 0 -5px ${colors.tertiary};
+    margin: 0;
+    padding: 3px 15px;
+`
+
 function FullPost({postId, postUserId, userId, userRoleId, tokenAuth, title, content, imgUrl, createdAt, updatedAt, likes, dislikes, userLike, postUpdated, setPostUpdated}){
-    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-    const [redirect, setRedirect] = useState(false);
-    const [error, setError] = useState("");
-
-    const handleRedirect = () => {
-        setRedirect(true)
-    }
-
-    const handleDelete = () => {
-        fetch(`http://localhost:3000/api/posts/${postId}`, {
-            'method' : 'DELETE',
-            headers: {
-                'authorization' : 'Bearer ' + tokenAuth
-            }
-        })
-        .then((resp) => resp.json())
-        .then((res) => {
-            if(res.error){
-                setError(res)
-            }
-            else{
-                setError(res);
-                setOpenDeleteDialog(true);    
-            }
-        })
-        .catch((err) => console.log(err))
-    }
-
     return(
-        <PostWrapper>
-            {redirect ? <Navigate to="/"/> : null}
-            <PostTitle>{title}</PostTitle>
-            <span>{content}</span>
-            {imgUrl != null ? 
-            (<a href={`${imgUrl}`}>
-                <PostImg src={imgUrl} alt=""/>
-            </a>) : null}
-            <p>Post créé le : {createdAt}</p>
-            {updatedAt !== createdAt ? <p>Modifié le : {updatedAt}</p> : null}
-            <LikesDislikes postId={postId} 
-                            tokenAuth={tokenAuth} 
-                            likes={likes} 
-                            dislikes={dislikes} 
-                            userLike={userLike}/>
-            {postUserId === userId || userRoleId === 1 ? (<>
-                <ModifyPost postId={postId}
-                            tokenAuth={tokenAuth}
-                            content={content}
-                            imgUrl={imgUrl}
-                            title={title}
-                            postUpdated={postUpdated}
-                            setPostUpdated={setPostUpdated}/>
-                <button onClick={handleDelete}>Delete</button>
-                <dialog open={openDeleteDialog}><p>{error.message || error.error}</p><button onClick={handleRedirect}>OK</button></dialog>
-            </>)
-            : null}
-            
-        </PostWrapper>
+        <>
+            <PostWrapper>
+                <ContentContainer>
+                    <PostTitle>{title}</PostTitle>
+
+                    <PostContent>{content}</PostContent>
+
+                    {imgUrl != null ? (<PostImg src={imgUrl} alt=""/>) : null}
+
+                    {updatedAt === createdAt ?
+                        (<PostDate>Créé le : {createdAt}</PostDate>)
+                    :
+                        (<PostDate>Créé le : {createdAt}, modifié le : {updatedAt}</PostDate>)
+                    }
+                </ContentContainer>
+
+                <ButtonsContainer>
+                    <LikesDislikesBtn 
+                        postId={postId} 
+                        tokenAuth={tokenAuth} 
+                        likes={likes} 
+                        dislikes={dislikes} 
+                        userLike={userLike}/>
+                    
+                    {postUserId === userId || userRoleId === 1 ?
+                        (<>
+                            <ModifyPostBtn
+                                postId={postId}
+                                tokenAuth={tokenAuth}
+                                content={content}
+                                title={title}
+                                postUpdated={postUpdated}
+                                setPostUpdated={setPostUpdated}/>
+                            <DeletePostBtn
+                                postId={postId} 
+                                tokenAuth={tokenAuth}/>
+                        </>)
+                    : null}
+                </ButtonsContainer>
+            </PostWrapper>
+        </>
     )
 }
 

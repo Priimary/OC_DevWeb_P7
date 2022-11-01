@@ -21,43 +21,55 @@ const PostWrapper = styled(Link)`
 `
 
 const PostTitle = styled.h2`
+    white-space: pre-wrap;
+    word-break: break-word;
     color: ${colors.tertiary};
     text-transform: uppercase;
-    font-size: 24px;
+    font-size: 26px;
     font-weight: bold;
-    margin: 0;
+    margin: 0 0 10px 0;
     padding: 10px 10px 0 10px;
     border-bottom: 5px solid ${colors.primary};
 `
 
-const PostContent = styled.p`
+const PostContent = styled.pre`
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    white-space: pre-wrap;
+    word-break: break-word;
     overflow: hidden;
-    white-space: nowrap;
     text-overflow: ellipsis;
+    padding: 0 30px;
     margin: 0;
-    padding: 10px;
+
+    @media all and (max-width: 768px){
+        -webkit-line-clamp: 3;
+    }
 `
 
 const PostImg = styled.img`
-
     border: 1px solid ${colors.tertiary};
     border-radius: 10px;
     box-shadow: 0 1px 1px 1px ${colors.tertiary};
-    width: 25%;
+    width: 300px;
     padding: 2px;
-    margin-bottom: 10px;
+    margin-top: 10px;
     align-self: center;
+
+    @media all and (max-width: 768px){
+        width: 200px;
+    }
 `
 
-const PostDate = styled.span`
+const PostDate = styled.p`
+    font-size: 14px;
     border-top: 5px solid ${colors.primary};
-    margin: 0;
-    padding: 10px;
+    margin: 10px 0 0 0;
+    padding: 5px 15px;
 `
-
 
 function Post({postId, title, content, imgUrl, createdAt, updatedAt}){
-
     return(
         <PostWrapper to={"/post/" + postId}>
             <PostTitle>{title}</PostTitle>

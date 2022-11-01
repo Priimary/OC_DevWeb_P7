@@ -16,7 +16,14 @@ exports.getAllPosts = (req, res, next) => {
 
 // récupère un post grâce à son id récupéré depuis les params de l'url depuis la table posts
 exports.getOnePost = (req, res, next) => {
-    var sqlSearchPost = "SELECT p.*, coalesce(sum(l.isLike = 1), 0) AS likes, coalesce(sum(l.isLike = 0), 0) AS dislikes, (SELECT isLike FROM likes_dislikes WHERE Post_id = ? AND User_id = ?) AS userLike FROM posts p LEFT JOIN likes_dislikes l ON p.id = l.Post_id WHERE p.id = ?";
+    var sqlSearchPost = `SELECT p.*,
+    coalesce(sum(l.isLike = 1), 0) likes,
+    coalesce(sum(l.isLike = 0), 0) dislikes,
+    (SELECT isLike FROM likes_dislikes WHERE Post_id = ? AND User_id = ?) userLike 
+    FROM posts p
+    LEFT JOIN likes_dislikes l
+    ON p.id = l.Post_id
+    WHERE p.id = ?`;
     var SearchPost = mysql.format(sqlSearchPost, [req.params.id, req.auth.userId, req.params.id]);
     db.query(SearchPost, (err,post) => {
         if(err){

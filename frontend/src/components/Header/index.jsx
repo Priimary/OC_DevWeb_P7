@@ -14,10 +14,20 @@ const HeaderContainer = styled.nav`
     height: 80px;
     justify-content: center;
     border-bottom: 2px solid ${colors.tertiary};
+    
+    @media all and (max-width: 768px){
+        gap: 15px;
+        flex-direction: column;
+        height: auto;
+    }
 `;
 
 const LogoImg = styled.img`
     height: 100%;
+
+    @media all and (max-width: 768px){
+        width: 100%;
+    }
 `;
 
 const LogoLink = styled(Link)`
@@ -26,8 +36,14 @@ const LogoLink = styled(Link)`
     ${(props) => 
         props.$isCenter && 
         `
+        width: 100%;
         text-align: center;
-        `}
+        `
+    }
+
+    @media all and (max-width: 768px){
+        width: 100%;
+    }
 `;
 
 const DisconnectLink = styled(Link)`
@@ -38,6 +54,11 @@ const DisconnectLink = styled(Link)`
     font-size: 18px;
     text-decoration: none;
     width: 50%;
+
+    @media all and (max-width: 768px){
+        align-self: center;
+        justify-content: center;
+    }
 `
 const LogOffIcon = styled.i`
     line-height: 1.2;

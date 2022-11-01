@@ -34,10 +34,13 @@ const StyledCloseBtn = styled.button`
     border: 1px solid ${colors.tertiary};
     border-radius: 15px;
     transition: 200ms;
+    padding: 0 5px;
     &:hover{
         cursor: pointer;
         box-shadow: 0 1px 1px 1px ${colors.tertiary};
     }
+
+
 `
 
 const StyledXMarkIcon = styled.i`
@@ -52,6 +55,13 @@ const StyledDialog = styled.dialog`
     position: fixed;
     top: 30px;
     padding: 20px;
+    width: 600px;
+
+    @media all and (max-width: 768px){
+        width: 80%;
+        margin: 0 auto;
+    }
+    
 `
 
 const StyledForm = styled.form`
@@ -74,7 +84,7 @@ const StyledInputTitle = styled.input`
     background-color: ${colors.backgroundColor};
     border: 1px solid ${colors.tertiary};
     border-radius: 5px;
-    width: 400px;
+    width: 80%;
 `
 
 const StyledInputContent = styled.textarea`
@@ -83,7 +93,7 @@ const StyledInputContent = styled.textarea`
     background-color: ${colors.backgroundColor};
     border: 1px solid ${colors.tertiary};
     border-radius: 5px;
-    width: 600px;
+    width: 90%;
     height: 100px;
 `
 
@@ -94,6 +104,7 @@ const StyledSubmitImg = styled.input`
     border-radius: 5px;
     padding: 5px 10px;
     font-weight: bold;
+    width: 80%;
     transition: 200ms;
     &:hover{
         cursor: pointer;
@@ -128,7 +139,7 @@ const ErrorMsg = styled.p`
     padding: 5px 20px;
 `
 
-function NewPost({tokenAuth}){
+function NewPostBtn({tokenAuth}){
     const [inputs, setInputs] = useState({});
     const [image, setImage] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
@@ -204,7 +215,7 @@ function NewPost({tokenAuth}){
                 <StyledInputTitle type="text" name="title" value={inputs.title || ""} onChange={handleChangeInputs} required/>
                         
                 <StyledLabel>Veuillez écrire votre message :</StyledLabel>
-                <StyledInputContent type="textarea" name="content" value={inputs.content || ""} onChange={handleChangeInputs} required/>
+                <StyledInputContent name="content" value={inputs.content || ""} onChange={handleChangeInputs} required/>
                         
                 <StyledLabel>Choisissez l'image que vous souhaitez envoyer :</StyledLabel>
                 <StyledSubmitImg type="file" name="image" onChange={handleChangeImage} accept="image/png, image/jpeg, image/jpg"/>
@@ -219,4 +230,4 @@ function NewPost({tokenAuth}){
     )
 }
 
-export default NewPost
+export default NewPostBtn

@@ -5,20 +5,18 @@ import {Navigate, Link} from 'react-router-dom';
 import {useSelector, useDispatch} from 'react-redux';
 import {login} from '../../features/auth/authSlice'
 
-const StyledLink = styled(Link)`
-    color: ${colors.tertiary};
-`
 const LoginContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin: 5px;
 `
+
 const StyledForm = styled.form`
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 20px;
-    width: 500px;
     padding: 15px;
     border: 3px solid ${colors.tertiary};
     background-color: ${colors.backgroundColor};
@@ -62,6 +60,11 @@ const ErrorMsg = styled.p`
     font-size: 18px;
     margin: 0;
     color: ${colors.primary};
+`
+
+const StyledLink = styled(Link)`
+    color: ${colors.tertiary};
+    text-align: center;
 `
 
 function Login(){
