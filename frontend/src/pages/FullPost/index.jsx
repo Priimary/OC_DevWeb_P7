@@ -1,5 +1,4 @@
 import Post from '../../components/FullPost';
-import colors from '../../utils/style/colors';
 import styled from 'styled-components';
 import {useEffect, useState} from 'react';
 import { Loader } from '../../utils/style/Atoms'

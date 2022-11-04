@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import colors from '../../utils/style/colors';
 import { Link } from 'react-router-dom';
@@ -78,15 +77,6 @@ function Post({postId, title, content, imgUrl, createdAt, updatedAt}){
             {updatedAt === createdAt ? <PostDate>Créé le : {createdAt}</PostDate> : <PostDate>Créé le : {createdAt}, modifié le : {updatedAt}</PostDate>}
         </PostWrapper>
     )
-}
-
-Post.propTypes = {
-    postId: PropTypes.number.isRequired,
-    title: PropTypes.string.isRequired,
-    content: PropTypes.string.isRequired,
-    imgUrl: PropTypes.string,
-    createdAt: PropTypes.string.isRequired,
-    updatedAt: PropTypes.string.isRequired
 }
 
 export default Post

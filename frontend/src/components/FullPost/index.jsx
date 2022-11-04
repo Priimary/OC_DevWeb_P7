@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import colors from '../../utils/style/colors';
 import ModifyPostBtn from '../ModifyPostBtn'
@@ -135,18 +134,6 @@ function FullPost({postId, postUserId, userId, userRoleId, tokenAuth, title, con
             </PostWrapper>
         </>
     )
-}
-
-FullPost.propTypes = {
-    postId: PropTypes.number.isRequired,
-    postUserId: PropTypes.number.isRequired,
-    userId: PropTypes.number.isRequired,
-    tokenAuth : PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    content: PropTypes.string.isRequired,
-    imgUrl: PropTypes.string,
-    createdAt: PropTypes.string.isRequired,
-    updatedAt: PropTypes.string.isRequired
 }
 
 export default FullPost

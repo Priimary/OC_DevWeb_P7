@@ -28,7 +28,7 @@ if(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,100}$/.test(pas
 exports.signup = (req, res, next) => {
     if(ValidateEmail(req.body.email)){
         if(ValidatePassword(req.body.password)){
-            bcrypt.hash(req.body.password, parseInt(process.env.HASHNUMBER))
+            bcrypt.hash(req.body.password, parseInt(process.env.SALTNUMBER))
                 .then(hash => {
                     var sqlSearchEmail = 'SELECT * FROM users WHERE email = ?';
                     var searchQuery = mysql.format(sqlSearchEmail, [req.body.email]);

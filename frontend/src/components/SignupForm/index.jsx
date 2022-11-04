@@ -17,7 +17,7 @@ const StyledForm = styled.form`
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
     width: 500px;
     padding: 15px;
     border: 3px solid ${colors.tertiary};
@@ -26,7 +26,6 @@ const StyledForm = styled.form`
     font-size: 18px;
     font-weight: bold;
 `
-
 
 const FormLabel = styled.label`
     color: ${colors.tertiary};
@@ -39,6 +38,12 @@ const FormInput = styled.input`
     background-color: ${colors.secondary};
     border: 1px solid ${colors.tertiary};
     border-radius: 5px;
+`
+
+const InputInfo = styled.p`
+    color: ${colors.tertiary};
+    font-size: 12px;
+    margin: 0;
 `
 
 const SubmitBtn = styled.input`
@@ -100,8 +105,6 @@ const DialogBox = styled.dialog`
     top: 30px;
     padding: 20px;
 `
-
-
 
 function Signup(){
     const [FormInputs, setFormInputs] = useState({});
@@ -168,9 +171,11 @@ function Signup(){
             <StyledForm method="post" onSubmit={handleSubmit}>
                 <FormLabel>Email :</FormLabel>
                 <FormInput type="email" name="email" value={FormInputs.email || ""} onChange={handleChange} placeholder="test@gmail.com" required/>
+                <InputInfo>[6-50 caractères, -_. acceptés]</InputInfo>
                 
                 <FormLabel>Mot de passe :</FormLabel>
                 <FormInput type="password" name="password" value={FormInputs.password || ""} onChange={handleChange} required/>
+                <InputInfo>[6-100 caractères, majuscule + minuscule + chiffre + caractère spécial requis]</InputInfo>
                 
                 <FormLabel>Répétition mot de passe :</FormLabel>
                 <FormInput type="password" name="repeatPassword" value={FormInputs.repeatPassword || ""} onChange={handleChange} required/>

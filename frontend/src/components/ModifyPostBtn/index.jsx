@@ -206,7 +206,6 @@ function ModifyPostBtn({postId, tokenAuth, title, content, postUpdated, setPostU
         if(image){
             formData.append('image', image);
         }
-        console.log(formData);
         fetch(`http://localhost:3000/api/posts/${postId}`, {
             method: 'PUT',
             headers: {

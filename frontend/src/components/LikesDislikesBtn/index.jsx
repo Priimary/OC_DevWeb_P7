@@ -153,7 +153,7 @@ function LikesDislikesBtn({postId, tokenAuth, likes, dislikes, userLike}){
                         'Content-Type': 'application/json',
                         'Authorization': 'Bearer ' + tokenAuth
                     },
-                    body: JSON.stringify(like)
+                    body: JSON.stringify(dislike)
                 })
                 .then((res) => res.json())
                 .then((data) => {

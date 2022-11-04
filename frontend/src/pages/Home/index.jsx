@@ -17,8 +17,13 @@ const PostsContainer = styled.div`
     flex-direction: column;
     margin: auto;
     gap: 40px;
-    width: 80%;
+    width: 70%;
+
+    @media all and (max-width: 768px){
+        width: 80%;
+    }
 `
+
 const LoaderWrapper = styled.div`
     display: flex;
     justify-content: center;
