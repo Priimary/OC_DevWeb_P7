@@ -1,6 +1,10 @@
-# OC-P7-DevWeb-Groupomania #
+# OC_DevWeb_P7 #
 
 This is the front & back-end server for Project 7 of the OpenClassrooms Web Developer Path.
+
+
+https://user-images.githubusercontent.com/83493072/205754464-23612fc2-d1b9-4f18-890d-4fb5b0101157.mp4
+
 
 ### Back end & Front end Prerequisites ###
 
